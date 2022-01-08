@@ -7,6 +7,8 @@ from pyvi import ViTokenizer, ViPosTagger
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+#################################
+# Các hàm tiền xử lý dữ liệu từ file notebook
 
 with open("stopwords/vietnamese-stopwords.txt",encoding='utf-8') as file:
     stopwords = file.readlines()
@@ -46,11 +48,6 @@ def is_stopword(token):
     global stopwords
     return True if token in stopwords else False
 
-# ===============================================================
-# Process:
-# Text -> Tokenize (pyvi) -> Remove punctuations -> Remove special chars 
-# -> Remove links -> Lowercase -> Remove stopwords -> Final Tokens
-# ===============================================================
 def vietnamese_text_preprocessing(text):
     tokens = tokenize(text)
     tokens = [token for token in tokens if not is_punctuation(token)]
@@ -61,18 +58,20 @@ def vietnamese_text_preprocessing(text):
     # return tokens
     return tokens
 
-
-
-@st.cache(allow_output_mutation=True)
-def load_session():
-    return requests.Session()
-
+###################################
+# Hàm dự đoán
 def model_predict(model, text):
     model_pd = pd.DataFrame()
     model_pd["text"] = [text]
     pred_result = model.predict(model_pd)[0]
     return pred_result
 
+###################################
+# Tạo website đơn giản bằng streamlit
+
+@st.cache(allow_output_mutation=True)
+def load_session():
+    return requests.Session()
 
 def main():
     st.set_page_config(
@@ -86,7 +85,8 @@ def main():
 
     model_dict = {
             "MLP Classifier": "models/mlpclassifier.pkl",
-            "Decision Tree": "models/decisiontree.pkl", 
+            "Decision Tree": "models/decisiontree.pkl",
+            "Multinomial Naive Bayes": "models/multinomialnb.pkl"
             }
     resources_dir = "Fake-News-Detection"
 
@@ -122,9 +122,9 @@ def main():
                 pred = model_predict(model, news)
 
                 if pred == 0:
-                    st.markdown("Non fake news")
+                    st.markdown("Non fake news.")
                 else:
-                    st.markdown("Fake news")
+                    st.markdown("Fake news!")
 
 
 if __name__ == "__main__":
